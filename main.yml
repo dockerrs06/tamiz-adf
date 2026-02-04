@@ -20,7 +20,7 @@
        - feature_itg
        - develop
   
-
+ pr: none
  pool:
    vmImage: 'windows-latest'
 
@@ -73,10 +73,10 @@
 
       # DEV Environment (develop branch)
       - ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
-        - template: template/deploy.yaml
+        - template: template/deploy.yml
           parameters:
             Environment: 'ISAC-DEV-ENV'
-            AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+            AzureServiceConnection: 'DEV-SUB' # it is belong to development azure devops service connection name.
             adfName: "$(datafactory_dev)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_dev)"
@@ -85,10 +85,10 @@
 
       # ITG Environment (feature_itg branch)
       - ${{ if eq(variables['Build.SourceBranchName'], 'feature_itg') }}:
-        - template: template/deploy.yaml
+        - template: template/deploy.yml
           parameters:
             Environment: 'ISAC-ITG-ENV'
-            AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+            AzureServiceConnection: 'DEV-SUB' # it is belong to development azure devops service connection name.
             adfName: "$(datafactory_itg)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_itg)"
@@ -97,7 +97,7 @@
 
       # PROD Environment (release branch)
       - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-        - template: template/deploy.yaml
+        - template: template/deploy.yml
           parameters:
             Environment: 'ISAC-PROD-ENV'
             AzureServiceConnection: 'ECAP-ADO-PRO-ServiceConnection' # it is  belong to proudction azure devops service connection name.
