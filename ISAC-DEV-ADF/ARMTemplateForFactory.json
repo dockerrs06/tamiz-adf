@@ -29,7 +29,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/rajan')]",
+			"name": "[concat(parameters('factoryName'), '/tamiz')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -247,7 +247,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "rajan",
+							"referenceName": "tamiz",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -264,7 +264,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/rajan')]"
+				"[concat(variables('factoryId'), '/pipelines/tamiz')]"
 			]
 		}
 	]
