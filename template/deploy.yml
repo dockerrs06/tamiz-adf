@@ -8,6 +8,9 @@ parameters:
     type: string
   - name: AzureServiceConnection
     type: string
+  - name: subscriptionID
+    type: string
+    
 jobs:
 - deployment: DeployADF
   displayName: Deploy ADF to ${{ parameters.environmentName }}
