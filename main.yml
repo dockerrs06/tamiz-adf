@@ -1,0 +1,438 @@
+#=================================================================================================================                       
+#                               ISAC_DEMO_ECAP_ISAC_INFORMATICA_ADF
+#=================================================================================================================
+#                                 Created_By   :R SUNDARRAJAN
+#                                 Email_ID     :Sundarrajan.r@hp.com
+#                                 Created_Date :31-01-2026
+#                                 Project_Name :ISAC PHASE-2
+#                                 Agent_Pool   :codeway-aws-win2022
+#================================================================================================================
+
+
+# ================================================================================================================
+#  Main.yaml:
+# ================================================================================================================
+
+ trigger:
+  branches:
+    include:
+       - main
+       - feature_itg
+       - develop
+  
+
+ pool:
+   pool: 'codeway-aws-win2022'
+  
+
+ stages:
+# ============================================================================================================================
+# 1) BUILD STAGE: Validate + Export ARM template + Publish artifact
+# Azure Data Factory does not provide a built in CLI for validating or exporting ARM templates.
+# Instead, Microsoft provides an ADF Utilities package, which is a Node.js-based tool, installed from npm:
+# ➡️ @microsoft/azure-data-factory-utilities
+# (or older: npm install -g azure-data-factory-utilities)
+
+
+# Your commands like:
+
+# run build validate
+# run build export
+# come from this npm package, not from Azure DevOps itself.
+
+# Before you can run the validate/export scripts, you must install the npm dependencies that contain those utility commands.
+# ==============================================================================================================================
+
+  - stage: Build
+    displayName: Build (Validate + Export ARM)
+    jobs:
+    - template: template/build.yml
+      parameters:
+        branchName: ${{ variables['Build.SourceBranchName'] }} 
+
+
+
+# ================================================================================================================
+  # DEPLOY STAGE: PUBLISH ARM TEMPLATE TO RESPECTIVE ENVIRONMENT
+  # This job deploys an Azure Data Factory (ADF) to a Resource Group using an ARM template and parameter file that 
+  # were previously built and published as a pipeline artifact.
+
+# Azure Data Factory (ADF) does NOT deploy pipelines, datasets, or triggers automatically.
+# The only DevOps supported way to deploy ADF from one environment to another is through ARM templates (or Bicep).
+# So your pipeline must use something like:
+# AzureResourceManagerTemplateDeployment@ Otherwise, ADF objects will never move from Dev → ITG → Production.
+# ===============================================================================================================
+  - stage: Deploy
+    displayName: 🚀 Deploy Stage
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - job: Initiate_deployment
+       
+
+      # DEV Environment (develop branch)
+      - ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
+        - template: template/deploy.yaml
+          parameters:
+            Environment: 'ISAC-DEV-ENV'
+            AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+            adfName: "dev"
+            subscriptionID: "dev"
+         
+          
+
+      # ITG Environment (feature_itg branch)
+      - ${{ if eq(variables['Build.SourceBranchName'], 'feature_itg') }}:
+        - template: template/deploy.yaml
+          parameters:
+            Environment: 'ISAC-ITG-ENV'
+            AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+            adfName: "dev"
+            subscriptionID: "dev"
+            
+           
+
+      # PROD Environment (release branch)
+      - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+        - template: template/deploy.yaml
+          parameters:
+            Environment: 'ISAC-PROD-ENV'
+            AzureServiceConnection: 'ECAP-ADO-PRO-ServiceConnection' # it is  belong to proudction azure devops service connection name.
+            adfName: "dev"
+            subscriptionID: "dev"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       # # ================= DEV DEPLOY =================
+
+  # - stage: Deploy_DEV
+  #   condition: eq(variables['Build.SourceBranchName'], 'main')
+  #   dependsOn: Build
+  #   jobs:
+  #   - template: template/deploy.yaml
+  #     parameters:
+  #       Environment: Develop
+  #       adfName: dev-isac-adf
+  #       AzureServiceConnection: svc-conn-dev-itg
+  #       # subscriptionType: dev
+
+
+  # # ================= ITG DEPLOY =================
+
+  # - stage: Deploy_ITG
+  #   condition: eq(variables['Build.SourceBranchName'], 'feature_itg')
+  #   dependsOn: Build
+  #   jobs:
+  #   - template: template/deploy.yaml
+  #     parameters:
+  #       Environment: ITG
+  #       adfName: itg-isa-adf
+  #       AzureServiceConnection: svc-conn-dev-itg
+  #       # subscriptionType: itg
+
+
+  # # # ================= PROD DEPLOY =================
+
+  # - stage: Deploy_PROD
+  #   condition: eq(variables['Build.SourceBranchName'], 'master')
+  #   dependsOn: Build
+  #   jobs:
+  #   - template: template/deploy.yaml
+  #     parameters:
+  #       Environment: PROD
+  #       adfName: prod-isac-adf
+  #       AzureServiceConnection: svc-conn-prod
+  #     # subscriptionType: prod
+      
+     
+
+  # =============================
+  # 🚀 DEPLOY STAGE
+  # =============================
+  # - stage: Deploy
+  #   displayName: 🚀 Deploy Stage
+  #   dependsOn: BuildAndPush
+  #   condition: succeeded()
+  #   jobs:
+  #     - job: Initiate_deployment
+  #     # DEV Environment (develop branch)
+  #     - ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
+  #       - template: template-deploye.yml
+  #         parameters:
+  #           Environment: 'ISAC-DEV-ENV'
+  #           AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+  #           adfName: dev-isac-adf
+  #           subscriptionId: ""
+                
+
+  #     # ITG Environment (feature_itg branch)
+  #     - ${{ if eq(variables['Build.SourceBranchName'], 'feature_itg') }}:
+  #       - template: template-deploye.yml
+  #         parameters:
+  #           Environment: 'ISAC-ITG-ENV'
+  #           AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+  #           adfName: itg-isac-adf
+  #           subscriptionId: ""
+           
+
+  #     # PROD Environment (release branch)
+  #     - ${{ if eq(variables['Build.SourceBranchName'], 'release') }}:
+  #       - template: template-deploye.yml
+  #         parameters:
+  #           Environment: 'ISAC-PROD-ENV'
+  #           AzureServiceConnection: 'ECAP-ADO-PRO-ServiceConnection' # it is  belong to proudction azure devops service connection name.
+  #           adfName: prod-isac-adf
+            # subscriptionId: ""
+# # ============================================================
+# # 2) DEPLOY DEV
+# # ============================================================
+# - stage: Deploy_DEV
+#   displayName: 'Deploy to DEV'
+#   dependsOn: Build
+#   condition: succeeded()
+#   jobs:
+#   - deployment: DeployDev
+#     displayName: 'ARM Deploy DEV'
+#     environment: 'DEV'  # Use Environments for approvals if you want
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - download: current
+#             artifact: 'drop'
+
+#           # Deploy ARM
+#           - task: AzureResourceManagerTemplateDeployment@3
+#             displayName: 'Deploy ARM Template - DEV'
+#             inputs:
+#               deploymentScope: 'Resource Group'
+#               azureResourceManagerConnection: '$(azureServiceConnection)'
+#               subscriptionId: '$(devSubscriptionId)'
+#               action: 'Create Or Update Resource Group'
+#               resourceGroupName: '$(devResourceGroup)'
+#               location: 'East US'   # CHANGE_ME if needed
+#               templateLocation: 'Linked artifact'
+#               csmFile: '$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json'
+#               csmParametersFile: '$(Pipeline.Workspace)/$(artifactName)/arm-parameters/dev.parameters.json'
+#               deploymentMode: 'Incremental'
+#               deploymentName: 'adf-dev-$(Build.BuildId)'
+
+
+          # OPTIONAL: Start triggers after deployment (recommended)
+          # - task: AzurePowerShell@5
+          #   displayName: 'Post-deploy (Start triggers) - DEV'
+          #   inputs:
+          #     azureSubscription: '$(azureServiceConnection)'
+          #     ScriptType: 'FilePath'
+          #     ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
+          #     ScriptArguments: >
+          #       -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
+          #       -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/dev.parameters.json"
+          #       -ResourceGroupName "$(devResourceGroup)"
+          #       -DataFactoryName "$(devFactoryName)"
+          #       -predeployment $false
+          #       -deleteDeployment $false
+          #     azurePowerShellVersion: 'LatestVersion'
+          #   condition: and(succeeded(), exists('$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'))
+
+
+# # ============================================================
+# # 3) DEPLOY FEATURE_ITG
+# # ============================================================
+# - stage: Deploy_FEATURE_ITG
+#   displayName: 'Deploy to FEATURE_ITG'
+#   dependsOn: Deploy_DEV
+#   condition: succeeded()
+#   jobs:
+#   - deployment: DeployItg
+#     displayName: 'ARM Deploy FEATURE_ITG'
+#     environment: 'FEATURE_ITG'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - download: current
+#             artifact: '$(artifactName)'
+
+#           # - task: AzurePowerShell@5
+#           #   displayName: 'Pre-deploy (Stop triggers) - FEATURE_ITG'
+#           #   inputs:
+#           #     azureSubscription: '$(azureServiceConnection)'
+#           #     ScriptType: 'FilePath'
+#           #     ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
+#           #     ScriptArguments: >
+#           #       -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
+#           #       -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/feature_itg.parameters.json"
+#           #       -ResourceGroupName "$(itgResourceGroup)"
+#           #       -DataFactoryName "$(itgFactoryName)"
+#           #       -predeployment $true
+#           #       -deleteDeployment $false
+#           #     azurePowerShellVersion: 'LatestVersion'
+#           #   condition: and(succeeded(), exists('$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'))
+
+#           - task: AzureResourceManagerTemplateDeployment@3
+#             displayName: 'Deploy ARM Template - FEATURE_ITG'
+#             inputs:
+#               deploymentScope: 'Resource Group'
+#               azureResourceManagerConnection: '$(azureServiceConnection)'
+#               subscriptionId: '$(itgSubscriptionId)'
+#               action: 'Create Or Update Resource Group'
+#               resourceGroupName: '$(itgResourceGroup)'
+#               location: 'East US'
+#               templateLocation: 'Linked artifact'
+#               csmFile: '$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json'
+#               csmParametersFile: '$(Pipeline.Workspace)/$(artifactName)/arm-parameters/feature_itg.parameters.json'
+#               deploymentMode: 'Incremental'
+#               deploymentName: 'adf-itg-$(Build.BuildId)'
+
+#           # - task: AzurePowerShell@5
+#           #   displayName: 'Post-deploy (Start triggers) - FEATURE_ITG'
+#           #   inputs:
+#           #     azureSubscription: '$(azureServiceConnection)'
+#           #     ScriptType: 'FilePath'
+#           #     ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
+#           #     ScriptArguments: >
+#           #       -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
+#           #       -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/feature_itg.parameters.json"
+#           #       -ResourceGroupName "$(itgResourceGroup)"
+#           #       -DataFactoryName "$(itgFactoryName)"
+#           #       -predeployment $false
+#           #       -deleteDeployment $false
+#           #     azurePowerShellVersion: 'LatestVersion'
+#           #   condition: and(succeeded(), exists('$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'))
+
+
+# # ============================================================
+# # 4) DEPLOY PROD
+# # ============================================================
+# - stage: Deploy_PROD
+#   displayName: 'Deploy to PROD'
+#   dependsOn: Deploy_FEATURE_ITG
+#   condition: succeeded()
+#   jobs:
+#   - deployment: DeployProd
+#     displayName: 'ARM Deploy PROD'
+#     environment: 'PROD'  # Add approval gates in Azure DevOps UI
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - download: current
+#             artifact: '$(artifactName)'
+
+#           # - task: AzurePowerShell@5
+#           #   displayName: 'Pre-deploy (Stop triggers) - PROD'
+#           #   inputs:
+#           #     azureSubscription: '$(azureServiceConnection)'
+#           #     ScriptType: 'FilePath'
+#           #     ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
+#           #     ScriptArguments: >
+#           #       -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
+#           #       -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/prod.parameters.json"
+#           #       -ResourceGroupName "$(prodResourceGroup)"
+#           #       -DataFactoryName "$(prodFactoryName)"
+#           #       -predeployment $true
+#           #       -deleteDeployment $false
+#           #     azurePowerShellVersion: 'LatestVersion'
+#           #   condition: and(succeeded(), exists('$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'))
+
+#           - task: AzureResourceManagerTemplateDeployment@3
+#             displayName: 'Deploy ARM Template - PROD'
+#             inputs:
+#               deploymentScope: 'Resource Group'
+#               azureResourceManagerConnection: '$(azureServiceConnection)'
+#               subscriptionId: '$(prodSubscriptionId)'
+#               action: 'Create Or Update Resource Group'
+#               resourceGroupName: '$(prodResourceGroup)'
+#               location: 'East US'
+#               templateLocation: 'Linked artifact'
+#               csmFile: '$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json'
+#               csmParametersFile: '$(Pipeline.Workspace)/$(artifactName)/arm-parameters/prod.parameters.json'
+#               deploymentMode: 'Incremental'
+#               deploymentName: 'adf-prod-$(Build.BuildId)'
+
+#           # - task: AzurePowerShell@5
+#           #   displayName: 'Post-deploy (Start triggers) - PROD'
+#           #   inputs:
+#           #     azureSubscription: '$(azureServiceConnection)'
+#           #     ScriptType: 'FilePath'
+#           #     ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
+#           #     ScriptArguments: >
+#           #       -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
+#           #       -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/prod.parameters.json"
+#           #       -ResourceGroupName "$(prodResourceGroup)"
+#           #       -DataFactoryName "$(prodFactoryName)"
+#           #       -predeployment $false
+#           #       -deleteDeployment $false
+#           #     azurePowerShellVersion: 'LatestVersion'
+#           #   condition: and(succeeded(), exists('$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'))
+
