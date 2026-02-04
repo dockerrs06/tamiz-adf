@@ -1,0 +1,53 @@
+
+parameters:
+  - name: Environment
+    type: string
+  - name: adfName
+    type: string
+  - name: resourceGroup
+    type: string
+  - name: AzureServiceConnection
+    type: string
+jobs:
+- deployment: DeployADF
+  displayName: Deploy ADF to ${{ parameters.environmentName }}
+  environment: ${{ parameters.environmentName }}
+
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: current
+          artifact: adf_arm
+        - task: AzureResourceManagerTemplateDeployment@3
+          displayName: ' Deploy ADF ARM Template'
+          inputs:
+            deploymentScope: 'Resource Group'
+            azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
+            subscriptionType: 'e3d41855-059e-4340-b9ba-28d873e8605b'
+            action: 'Create Or Update Resource Group'
+            resourceGroupName: ${{ parameters.resourceGroup }}
+            location: 'Central India'
+            templateLocation: 'Linked artifact'
+            csmFile: '$(Pipeline.Workspace)/drop/ARMTemplateForFactory.json'
+            csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
+            overrideParameters: |
+                -factoryName ${{ parameters.adfName }}
+            deploymentMode: 'Incremental'   
+            
+        # - task: AzureResourceManagerTemplateDeployment@3
+        #   displayName: 'Deploy ARM Template - DEV'
+        #   inputs:
+        #     deploymentScope: 'Resource Group'
+        #     azureResourceManagerConnection: '$(azureServiceConnection)'
+        #     subscriptionId: '$(devSubscriptionId)'
+        #     action: 'Create Or Update Resource Group'
+        #     resourceGroupName: '$(devResourceGroup)'
+        #     location: 'East US'   # CHANGE_ME if needed
+        #     templateLocation: 'Linked artifact'
+        #     csmFile: '$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json'
+        #     csmParametersFile: '$(Pipeline.Workspace)/$(artifactName)/arm-parameters/dev.parameters.json'
+        #     deploymentMode: 'Incremental'
+        #     deploymentName: 'adf-dev-$(Build.BuildId)' 
+            
+         
