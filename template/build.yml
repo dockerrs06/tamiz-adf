@@ -1,0 +1,66 @@
+
+parameters:
+  - name: branchName
+    type: string
+
+
+jobs:
+  - job: BuildJob
+    displayName: "Build (Validate + Export ARM)"
+    steps:
+      - checkout: self
+
+      - script: |
+          echo "Branch detected: ${{ parameters.branchName }}"
+          echo "##vso[task.setvariable variable=branchName]${{ parameters.branchName }}"
+        displayName: 🧭 Fetch Branch details
+
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '22.x'
+        displayName: 'Install Node.js'
+
+      - task: Npm@1
+        inputs:
+          command: 'install'
+          workingDir: '$(Build.Repository.LocalPath)' #replace with the package.json folder
+          verbose: true
+        displayName: 'Install npm package'
+
+
+
+      - task: Npm@1
+        inputs:
+          command: 'custom'
+          workingDir: '$(Build.Repository.LocalPath)' #replace with the package.json folder
+          customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/$(devSubscriptionId)/resourceGroups/$(devResourceGroup)/providers/Microsoft.DataFactory/factories/$(factoryName)'
+        displayName: 'Validate'
+
+
+
+      - task: Npm@1
+        inputs:
+          command: 'custom'
+          workingDir: '$(Build.Repository.LocalPath)' #replace with the package.json folder
+          customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/$(devSubscriptionId)/resourceGroups/$(devResourceGroup)/providers/Microsoft.DataFactory/factories/$(factoryName) "ArmTemplate"'
+        displayName: 'Validate and Generate ARM template'
+    
+    
+      - task: CopyFiles@2
+        displayName: 'Copy ARM templates to artifact staging'
+        inputs:
+          SourceFolder: '$(Build.Repository.LocalPath)\ArmTemplate'
+          Contents: '**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    
+
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+
+
+       
