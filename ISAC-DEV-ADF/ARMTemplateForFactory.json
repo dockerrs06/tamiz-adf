@@ -29,13 +29,13 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/dev_pipline1')]",
+			"name": "[concat(parameters('factoryName'), '/rajan')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "sundar",
+						"name": "sundarrajan",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
