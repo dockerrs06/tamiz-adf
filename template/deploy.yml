@@ -15,7 +15,6 @@ jobs:
 - deployment: DeployADF
   displayName: Deploy ADF to ${{ parameters.environmentName }}
   environment: ${{ parameters.environmentName }}
-
   strategy:
     runOnce:
       deploy:
