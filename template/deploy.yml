@@ -13,8 +13,8 @@ parameters:
     
 jobs:
 - deployment: DeployADF
-  displayName: Deploy ADF to ${{ parameters.environmentName }}
-  environment: ${{ parameters.environmentName }}
+  displayName: Deploy ADF to ${{ parameters.Environment }}
+  environment: ${{ parameters.Environment }}
   strategy:
     runOnce:
       deploy:
