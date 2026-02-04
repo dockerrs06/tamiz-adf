@@ -22,7 +22,8 @@
   
 
  pool:
-   pool: 'codeway-aws-win2022'
+   vmImage: 'windows-latest'
+
   
 
  stages:
@@ -76,8 +77,8 @@
           parameters:
             Environment: 'ISAC-DEV-ENV'
             AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
-            adfName: "dev"
-            subscriptionID: "dev"
+            adfName: "$(datafactory_dev)"
+            subscriptionID: "$(devSubscriptionId)"
          
           
 
@@ -87,8 +88,8 @@
           parameters:
             Environment: 'ISAC-ITG-ENV'
             AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
-            adfName: "dev"
-            subscriptionID: "dev"
+            adfName: "$(datafactory_itg)"
+            subscriptionID: "$(devSubscriptionId)"
             
            
 
