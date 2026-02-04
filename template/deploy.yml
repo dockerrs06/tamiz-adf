@@ -10,6 +10,7 @@ parameters:
     type: string
   - name: subscriptionID
     type: string
+
     
 jobs:
 - deployment: DeployADF
