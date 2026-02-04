@@ -33,7 +33,7 @@ jobs:
         inputs:
           command: 'custom'
           workingDir: '$(Build.Repository.LocalPath)' #replace with the package.json folder
-          customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/$(devSubscriptionId)/resourceGroups/$(devResourceGroup)/providers/Microsoft.DataFactory/factories/$(factoryName)'
+          customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/$(devSubscriptionId)/resourceGroups/$(resoucegroup_dev)/providers/Microsoft.DataFactory/factories/$(datafactory_dev)'
         displayName: 'Validate'
 
 
@@ -42,7 +42,7 @@ jobs:
         inputs:
           command: 'custom'
           workingDir: '$(Build.Repository.LocalPath)' #replace with the package.json folder
-          customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/$(devSubscriptionId)/resourceGroups/$(devResourceGroup)/providers/Microsoft.DataFactory/factories/$(factoryName) "ArmTemplate"'
+          customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/$(devSubscriptionId)/resourceGroups/$(resoucegroup_dev)/providers/Microsoft.DataFactory/factories/$(datafactory_dev) "ArmTemplate"'
         displayName: 'Validate and Generate ARM template'
     
     
