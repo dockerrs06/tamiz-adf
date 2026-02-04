@@ -1,9 +1,9 @@
 {
-	"name": "dev_pipline1",
+	"name": "rajan",
 	"properties": {
 		"activities": [
 			{
-				"name": "sundar",
+				"name": "sundarrajan",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
