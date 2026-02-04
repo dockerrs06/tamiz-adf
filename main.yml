@@ -76,7 +76,7 @@
         - template: template/deploy.yml
           parameters:
             Environment: 'ISAC-DEV-ENV'
-            AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+            AzureServiceConnection: 'DEV-SUB' # it is belong to development azure devops service connection name.
             adfName: "$(datafactory_dev)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_dev)"
@@ -88,7 +88,7 @@
         - template: template/deploy.yml
           parameters:
             Environment: 'ISAC-ITG-ENV'
-            AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
+            AzureServiceConnection: 'DEV-SUB' # it is belong to development azure devops service connection name.
             adfName: "$(datafactory_itg)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_itg)"
