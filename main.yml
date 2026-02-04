@@ -79,6 +79,7 @@
             AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
             adfName: "$(datafactory_dev)"
             subscriptionID: "$(devSubscriptionId)"
+            resourceGroup: "$(resoucegroup_dev)"
          
           
 
@@ -90,6 +91,7 @@
             AzureServiceConnection: 'ECAP-ADO-ServiceConnection' # it is belong to development azure devops service connection name.
             adfName: "$(datafactory_itg)"
             subscriptionID: "$(devSubscriptionId)"
+            resourceGroup: "$(resoucegroup_itg)"
             
            
 
