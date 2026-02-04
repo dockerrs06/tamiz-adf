@@ -20,8 +20,21 @@ jobs:
     runOnce:
       deploy:
         steps:
-        - download: current
-          artifact: adf_arm
+        - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+            inputs:
+              source: 'current'
+              path: '$(Pipeline.Workspace)'
+        # - powershell: |
+        #     Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+        #     Get-ChildItem -Recurse -File $(System.DefaultWorkingDirectory)\drop | Select-Object FullName
+        #   displayName: 'List downloaded files'
+
+          # 2) Diagnostics: list downloaded files
+        - powershell: |
+            Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+            Write-Host "Listing 'drop' contents..."
+            Get-ChildItem -Recurse -File "$(System.DefaultWorkingDirectory)\drop" | Select-Object FullName
+          displayName: 'List downloaded files'
         - task: AzureResourceManagerTemplateDeployment@3
           displayName: ' Deploy ADF ARM Template'
           inputs:
