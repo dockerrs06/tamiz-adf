@@ -161,7 +161,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dev_pipline')]",
+			"name": "[concat(parameters('factoryName'), '/dev_pipline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
