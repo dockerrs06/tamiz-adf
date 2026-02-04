@@ -167,7 +167,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Copy data1",
+						"name": "sundar",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
