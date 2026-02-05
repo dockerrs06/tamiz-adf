@@ -4,12 +4,6 @@
 	"parameters": {
 		"factoryName": {
 			"value": "ISAC-DEV-ADF"
-		},
-		"dest_ls_dev_connectionString": {
-			"value": ""
-		},
-		"source_ls_dev_connectionString": {
-			"value": ""
 		}
 	}
 }

@@ -6,45 +6,10 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "ISAC-DEV-ADF"
-		},
-		"dest_ls_dev_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'dest_ls_dev'"
-		},
-		"source_ls_dev_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'source_ls_dev'"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
-	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/dest_ls_dev')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('dest_ls_dev_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/source_ls_dev')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('source_ls_dev_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		}
-	]
+	"resources": []
 }
