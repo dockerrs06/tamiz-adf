@@ -1,1 +1,14 @@
-
+{
+  "factoryName": {
+    "value": "dev-isac-adf"
+  },
+  "oracleServer": {
+    "value": "dev-oracle.company.com"
+  },
+  "storageAccount": {
+    "value": "devisacstorage"
+  },
+  "sqlDbName": {
+    "value": "dev_isac_db"
+  }
+}
