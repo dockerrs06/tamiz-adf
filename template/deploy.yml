@@ -90,15 +90,13 @@ jobs:
             azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
             subscriptionId: ${{ parameters.subscriptionID }}
             action: 'Create Or Update Resource Group'
-            resourceGroupName: ${{ parameters.resourceGroup }}
+            resourceGroupName: ${{ parameters.resourceGroup }} 
             location: 'Central India'
             templateLocation: 'Linked artifact'
             csmFile: '$(Pipeline.Workspace)/drop/ARMTemplateForFactory.json'
             csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
             overrideParameters: |
               -factoryName ${{ parameters.adfName }}
-              # -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
-              # -AzureBlobStorage2_connectionString "$(blobDestConnString)"
             deploymentMode: 'Incremental'
 
         # -----------------------------------------------
@@ -127,8 +125,8 @@ jobs:
 #   - name: AzureServiceConnection
 #     type: string
 #   - name: subscriptionID
-#     type: string
-
+#     type:         # -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
+              # -AzureBlobStorage2_connectionString "$(blobDestConnString)"
 # jobs:
 # - deployment: DeployADF
 #   displayName: Deploy ADF to ${{ parameters.Environment }}
