@@ -14,9 +14,6 @@
 		"source_ls_dev_connectionString": {
 			"value": ""
 		},
-		"source_ls_itg_connectionString": {
-			"value": ""
-		},
 		"containerUri": {
 			"value": ""
 		},

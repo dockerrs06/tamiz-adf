@@ -19,10 +19,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'source_ls_dev'"
 		},
-		"source_ls_itg_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'source_ls_itg'"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -58,9 +54,6 @@
 					},
 					"source_ls_dev_connectionString": {
 						"value": "[parameters('source_ls_dev_connectionString')]"
-					},
-					"source_ls_itg_connectionString": {
-						"value": "[parameters('source_ls_itg_connectionString')]"
 					}
 				}
 			},

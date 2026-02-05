@@ -18,10 +18,6 @@
 		"source_ls_dev_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'source_ls_dev'"
-		},
-		"source_ls_itg_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'source_ls_itg'"
 		}
 	},
 	"variables": {
@@ -63,19 +59,6 @@
 				"type": "AzureBlobStorage",
 				"typeProperties": {
 					"connectionString": "[parameters('source_ls_dev_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/source_ls_itg')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('source_ls_itg_connectionString')]"
 				}
 			},
 			"dependsOn": []
