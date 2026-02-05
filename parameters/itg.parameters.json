@@ -1,1 +1,15 @@
+{
+  "factoryName": {
+    "value": "itg-isa-adf"
+  },
+  "oracleServer": {
+    "value": "itg-oracle.company.com"
+  },
+  "storageAccount": {
+    "value": "itgisacstorage"
+  },
+  "sqlDbName": {
+    "value": "itg_isac_db"
+  }
+}
 
