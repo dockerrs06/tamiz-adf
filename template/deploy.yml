@@ -96,10 +96,9 @@ jobs:
             csmFile: '$(Pipeline.Workspace)/drop/ARMTemplateForFactory.json'
             csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
             overrideParameters: |
-              -factoryName ${{ parameters.adfName }}
+              -factoryName "$(adfName)"
               -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
               -AzureBlobStorage2_connectionString "$(blobDestConnString)"
-
             deploymentMode: 'Incremental'
 
         # -----------------------------------------------
