@@ -80,6 +80,7 @@
             adfName: "$(datafactory_dev)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_dev)"
+            
          
           
 
