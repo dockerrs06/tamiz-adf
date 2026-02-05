@@ -1,1 +1,15 @@
+{
+  "factoryName": {
+    "value": "prod-isac-adf"
+  },
+  "oracleServer": {
+    "value": "prod-oracle.company.com"
+  },
+  "storageAccount": {
+    "value": "prodisacstorage"
+  },
+  "sqlDbName": {
+    "value": "prod_isac_db"
+  }
+}
 
