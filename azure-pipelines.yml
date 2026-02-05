@@ -38,14 +38,13 @@ jobs:
         - task: AzurePowerShell@5
           displayName: 'Pre-deploy (Stop triggers) - PROD'
           inputs:
-            azureSubscription: '$(azureServiceConnection)'
+            azureSubscription: '$(AzureServiceConnection)'
             ScriptType: 'FilePath'
             ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
             ScriptArguments: >
-              -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
-              -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/prod.parameters.json"
-              -ResourceGroupName "$(prodResourceGroup)"
-              -DataFactoryName "$(prodFactoryName)"
+              -armTemplate "$(Pipeline.Workspace)/$(artifactName)/ARMTemplateForFactory.json"
+              -ResourceGroupName ${{ parameters.resourceGroup }}
+              -DataFactoryName ${{ parameters.adfName }}
               -predeployment $true
               -deleteDeployment $false
             azurePowerShellVersion: 'LatestVersion'
@@ -65,20 +64,24 @@ jobs:
             csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
             overrideParameters: |
                 -factoryName ${{ parameters.adfName }}
+                
+# -Storage_url "$(storageUrl)"
+#   -Oracle_host "$(oracleHost)
+
             deploymentMode: 'Incremental'   
 
 
         - task: AzurePowerShell@5
           displayName: 'Post-deploy (Start triggers) - PROD'
           inputs:
-            azureSubscription: '$(azureServiceConnection)'
+            azureSubscription: '$(AzureServiceConnection)'
             ScriptType: 'FilePath'
             ScriptPath: '$(Pipeline.Workspace)/$(artifactName)/scripts/PrePostDeploymentScript.ps1'
             ScriptArguments: >
               -armTemplate "$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json"
-              -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/prod.parameters.json"
-              -ResourceGroupName "$(prodResourceGroup)"
-              -DataFactoryName "$(prodFactoryName)"
+              # -armTemplateParameters "$(Pipeline.Workspace)/$(artifactName)/arm-parameters/prod.parameters.json"
+              -ResourceGroupName ${{ parameters.resourceGroup }}
+              -DataFactoryName ${{ parameters.adfName }}
               -predeployment $false
               -deleteDeployment $false
             azurePowerShellVersion: 'LatestVersion'
