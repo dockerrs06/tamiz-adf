@@ -22,7 +22,7 @@ jobs:
           displayName: 'Download build artifacts'
           inputs:
             source: current
-            path: '$(Pipeline.Workspace)/drop'
+            path: '$(Pipeline.Workspace)'
 
         - powershell: |
             Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
