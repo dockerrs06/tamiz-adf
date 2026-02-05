@@ -1,3 +1,4 @@
+
 parameters:
   - name: Environment
     type: string
@@ -18,33 +19,58 @@ jobs:
     runOnce:
       deploy:
         steps:
+
+        # -----------------------------------------------
+        # 1) Download Build Artifacts
+        # -----------------------------------------------
         - task: DownloadPipelineArtifact@2
           displayName: 'Download build artifacts'
           inputs:
             source: current
             path: '$(Pipeline.Workspace)'
 
+        # -----------------------------------------------
+        # 2) List Artifact Files (Debug)
+        # -----------------------------------------------
         - powershell: |
-            Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
-            Write-Host "Listing 'drop' contents..."
+            Write-Host "Listing drop contents:"
             Get-ChildItem -Recurse -File "$(Pipeline.Workspace)/drop" | Select-Object FullName
           displayName: 'List downloaded files'
 
-        # Pre-deploy: Stop triggers
+        # -----------------------------------------------
+        # 3) Check if Script Exists
+        # -----------------------------------------------
+        - powershell: |
+            $path = "$(Pipeline.Workspace)/drop/script/PrePostDeploymentScript.ps1"
+            Write-Host "Checking: $path"
+            if (Test-Path $path) {
+              Write-Host "##vso[task.setvariable variable=scriptExists]true"
+              Write-Host "Script found."
+            } else {
+              Write-Host "##vso[task.setvariable variable=scriptExists]false"
+              Write-Host "Script NOT found!"
+            }
+          displayName: 'Verify script exists'
+
+        # -----------------------------------------------
+        # 4) Stop Triggers (Pre-deploy)
+        # -----------------------------------------------
         - task: AzurePowerShell@5
           displayName: 'Pre-deploy: Stop ADF triggers'
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: 'FilePath'
-            ScriptPath: '$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'
+            ScriptPath: '$(Pipeline.Workspace)/drop/script/PrePostDeploymentScript.ps1'
             ScriptArguments: >
               -ResourceGroupName ${{ parameters.resourceGroup }}
               -DataFactoryName ${{ parameters.adfName }}
               -Action Stop
             azurePowerShellVersion: 'LatestVersion'
-          condition: and(succeeded(), exists('$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'))
+          condition: and(succeeded(), eq(variables.scriptExists, 'true'))
 
-        # Deploy ARM
+        # -----------------------------------------------
+        # 5) Deploy ARM Template
+        # -----------------------------------------------
         - task: AzureResourceManagerTemplateDeployment@3
           displayName: 'Deploy ADF ARM Template'
           inputs:
@@ -61,19 +87,98 @@ jobs:
               -factoryName ${{ parameters.adfName }}
             deploymentMode: 'Incremental'
 
-        # Post-deploy: Start triggers
+        # -----------------------------------------------
+        # 6) Start Triggers (Post-deploy)
+        # -----------------------------------------------
         - task: AzurePowerShell@5
           displayName: 'Post-deploy: Start ADF triggers'
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: 'FilePath'
-            ScriptPath: '$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'
+            ScriptPath: '$(Pipeline.Workspace)/drop/script/PrePostDeploymentScript.ps1'
             ScriptArguments: >
               -ResourceGroupName ${{ parameters.resourceGroup }}
               -DataFactoryName ${{ parameters.adfName }}
               -Action Start
             azurePowerShellVersion: 'LatestVersion'
-          condition: and(succeeded(), exists('$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'))
+          condition: and(succeeded(), eq(variables.scriptExists, 'true'))
+
+# parameters:
+#   - name: Environment
+#     type: string
+#   - name: adfName
+#     type: string
+#   - name: resourceGroup
+#     type: string
+#   - name: AzureServiceConnection
+#     type: string
+#   - name: subscriptionID
+#     type: string
+
+# jobs:
+# - deployment: DeployADF
+#   displayName: Deploy ADF to ${{ parameters.Environment }}
+#   environment: ${{ parameters.Environment }}
+#   strategy:
+#     runOnce:
+#       deploy:
+#         steps:
+#         - task: DownloadPipelineArtifact@2
+#           displayName: 'Download build artifacts'
+#           inputs:
+#             source: current
+#             path: '$(Pipeline.Workspace)'
+
+#         - powershell: |
+#             Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+#             Write-Host "Listing 'drop' contents..."
+#             Get-ChildItem -Recurse -File "$(Pipeline.Workspace)/drop" | Select-Object FullName
+#           displayName: 'List downloaded files'
+
+#         # Pre-deploy: Stop triggers
+#         - task: AzurePowerShell@5
+#           displayName: 'Pre-deploy: Stop ADF triggers'
+#           inputs:
+#             azureSubscription: ${{ parameters.AzureServiceConnection }}
+#             ScriptType: 'FilePath'
+#             ScriptPath: '$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'
+#             ScriptArguments: >
+#               -ResourceGroupName ${{ parameters.resourceGroup }}
+#               -DataFactoryName ${{ parameters.adfName }}
+#               -Action Stop
+#             azurePowerShellVersion: 'LatestVersion'
+#           condition: and(succeeded(), exists('$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'))
+
+#         # Deploy ARM
+#         - task: AzureResourceManagerTemplateDeployment@3
+#           displayName: 'Deploy ADF ARM Template'
+#           inputs:
+#             deploymentScope: 'Resource Group'
+#             azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
+#             subscriptionId: ${{ parameters.subscriptionID }}
+#             action: 'Create Or Update Resource Group'
+#             resourceGroupName: ${{ parameters.resourceGroup }}
+#             location: 'Central India'
+#             templateLocation: 'Linked artifact'
+#             csmFile: '$(Pipeline.Workspace)/drop/ARMTemplateForFactory.json'
+#             csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
+#             overrideParameters: |
+#               -factoryName ${{ parameters.adfName }}
+#             deploymentMode: 'Incremental'
+
+#         # Post-deploy: Start triggers
+#         - task: AzurePowerShell@5
+#           displayName: 'Post-deploy: Start ADF triggers'
+#           inputs:
+#             azureSubscription: ${{ parameters.AzureServiceConnection }}
+#             ScriptType: 'FilePath'
+#             ScriptPath: '$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'
+#             ScriptArguments: >
+#               -ResourceGroupName ${{ parameters.resourceGroup }}
+#               -DataFactoryName ${{ parameters.adfName }}
+#               -Action Start
+#             azurePowerShellVersion: 'LatestVersion'
+#           condition: and(succeeded(), exists('$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'))
 # parameters:
 #   - name: Environment
 #     type: string
