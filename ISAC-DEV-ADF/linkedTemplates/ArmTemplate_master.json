@@ -11,10 +11,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dest_ls_dev'"
 		},
-		"dest_ls_itg_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'dest_ls_itg'"
-		},
 		"source_ls_dev_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'source_ls_dev'"
@@ -48,9 +44,6 @@
 					},
 					"dest_ls_dev_connectionString": {
 						"value": "[parameters('dest_ls_dev_connectionString')]"
-					},
-					"dest_ls_itg_connectionString": {
-						"value": "[parameters('dest_ls_itg_connectionString')]"
 					},
 					"source_ls_dev_connectionString": {
 						"value": "[parameters('source_ls_dev_connectionString')]"

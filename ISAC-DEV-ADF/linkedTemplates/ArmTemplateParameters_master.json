@@ -8,9 +8,6 @@
 		"dest_ls_dev_connectionString": {
 			"value": ""
 		},
-		"dest_ls_itg_connectionString": {
-			"value": ""
-		},
 		"source_ls_dev_connectionString": {
 			"value": ""
 		},
