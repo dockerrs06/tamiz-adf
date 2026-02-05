@@ -1,4 +1,3 @@
-
 parameters:
   - name: Environment
     type: string
@@ -11,7 +10,6 @@ parameters:
   - name: subscriptionID
     type: string
 
-    
 jobs:
 - deployment: DeployADF
   displayName: Deploy ADF to ${{ parameters.Environment }}
@@ -20,27 +18,39 @@ jobs:
     runOnce:
       deploy:
         steps:
-        - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download build artifacts'
           inputs:
-            source: 'current'
-            path: '$(Pipeline.Workspace)'
-        # - powershell: |
-        #     Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
-        #     Get-ChildItem -Recurse -File $(System.DefaultWorkingDirectory)\drop | Select-Object FullName
-        #   displayName: 'List downloaded files'
+            source: current
+            path: '$(Pipeline.Workspace)/drop'
 
-          # 2) Diagnostics: list downloaded files
         - powershell: |
             Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
             Write-Host "Listing 'drop' contents..."
-            Get-ChildItem -Recurse -File "$(System.DefaultWorkingDirectory)\drop" | Select-Object FullName
+            Get-ChildItem -Recurse -File "$(Pipeline.Workspace)/drop" | Select-Object FullName
           displayName: 'List downloaded files'
+
+        # Pre-deploy: Stop triggers
+        - task: AzurePowerShell@5
+          displayName: 'Pre-deploy: Stop ADF triggers'
+          inputs:
+            azureSubscription: ${{ parameters.AzureServiceConnection }}
+            ScriptType: 'FilePath'
+            ScriptPath: '$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'
+            ScriptArguments: >
+              -ResourceGroupName ${{ parameters.resourceGroup }}
+              -DataFactoryName ${{ parameters.adfName }}
+              -Action Stop
+            azurePowerShellVersion: 'LatestVersion'
+          condition: and(succeeded(), exists('$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'))
+
+        # Deploy ARM
         - task: AzureResourceManagerTemplateDeployment@3
-          displayName: ' Deploy ADF ARM Template'
+          displayName: 'Deploy ADF ARM Template'
           inputs:
             deploymentScope: 'Resource Group'
             azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
-            devSubscriptionId: 'e3d41855-059e-4340-b9ba-28d873e8605b'
+            subscriptionId: ${{ parameters.subscriptionID }}
             action: 'Create Or Update Resource Group'
             resourceGroupName: ${{ parameters.resourceGroup }}
             location: 'Central India'
@@ -48,22 +58,87 @@ jobs:
             csmFile: '$(Pipeline.Workspace)/drop/ARMTemplateForFactory.json'
             csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
             overrideParameters: |
-                -factoryName ${{ parameters.adfName }}
-            deploymentMode: 'Incremental'   
+              -factoryName ${{ parameters.adfName }}
+            deploymentMode: 'Incremental'
+
+        # Post-deploy: Start triggers
+        - task: AzurePowerShell@5
+          displayName: 'Post-deploy: Start ADF triggers'
+          inputs:
+            azureSubscription: ${{ parameters.AzureServiceConnection }}
+            ScriptType: 'FilePath'
+            ScriptPath: '$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'
+            ScriptArguments: >
+              -ResourceGroupName ${{ parameters.resourceGroup }}
+              -DataFactoryName ${{ parameters.adfName }}
+              -Action Start
+            azurePowerShellVersion: 'LatestVersion'
+          condition: and(succeeded(), exists('$(Pipeline.Workspace)/drop/scripts/PrePostDeploymentScript.ps1'))
+# parameters:
+#   - name: Environment
+#     type: string
+#   - name: adfName
+#     type: string
+#   - name: resourceGroup
+#     type: string
+#   - name: AzureServiceConnection
+#     type: string
+#   - name: subscriptionID
+#     type: string
+
+    
+# jobs:
+# - deployment: DeployADF
+#   displayName: Deploy ADF to ${{ parameters.Environment }}
+#   environment: ${{ parameters.Environment }}
+#   strategy:
+#     runOnce:
+#       deploy:
+#         steps:
+#         - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+#           inputs:
+#             source: 'current'
+#             path: '$(Pipeline.Workspace)'
+#         # - powershell: |
+#         #     Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+#         #     Get-ChildItem -Recurse -File $(System.DefaultWorkingDirectory)\drop | Select-Object FullName
+#         #   displayName: 'List downloaded files'
+
+#           # 2) Diagnostics: list downloaded files
+#         - powershell: |
+#             Write-Host "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+#             Write-Host "Listing 'drop' contents..."
+#             Get-ChildItem -Recurse -File "$(System.DefaultWorkingDirectory)\drop" | Select-Object FullName
+#           displayName: 'List downloaded files'
+#         - task: AzureResourceManagerTemplateDeployment@3
+#           displayName: ' Deploy ADF ARM Template'
+#           inputs:
+#             deploymentScope: 'Resource Group'
+#             azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
+#             devSubscriptionId: 'e3d41855-059e-4340-b9ba-28d873e8605b'
+#             action: 'Create Or Update Resource Group'
+#             resourceGroupName: ${{ parameters.resourceGroup }}
+#             location: 'Central India'
+#             templateLocation: 'Linked artifact'
+#             csmFile: '$(Pipeline.Workspace)/drop/ARMTemplateForFactory.json'
+#             csmParametersFile: '$(Pipeline.Workspace)/drop/ARMTemplateParametersForFactory.json'
+#             overrideParameters: |
+#                 -factoryName ${{ parameters.adfName }}
+#             deploymentMode: 'Incremental'   
             
-        # - task: AzureResourceManagerTemplateDeployment@3
-        #   displayName: 'Deploy ARM Template - DEV'
-        #   inputs:
-        #     deploymentScope: 'Resource Group'
-        #     azureResourceManagerConnection: '$(azureServiceConnection)'
-        #     subscriptionId: '$(devSubscriptionId)'
-        #     action: 'Create Or Update Resource Group'
-        #     resourceGroupName: '$(devResourceGroup)'
-        #     location: 'East US'   # CHANGE_ME if needed
-        #     templateLocation: 'Linked artifact'
-        #     csmFile: '$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json'
-        #     csmParametersFile: '$(Pipeline.Workspace)/$(artifactName)/arm-parameters/dev.parameters.json'
-        #     deploymentMode: 'Incremental'
-        #     deploymentName: 'adf-dev-$(Build.BuildId)' 
+#         # - task: AzureResourceManagerTemplateDeployment@3
+#         #   displayName: 'Deploy ARM Template - DEV'
+#         #   inputs:
+#         #     deploymentScope: 'Resource Group'
+#         #     azureResourceManagerConnection: '$(azureServiceConnection)'
+#         #     subscriptionId: '$(devSubscriptionId)'
+#         #     action: 'Create Or Update Resource Group'
+#         #     resourceGroupName: '$(devResourceGroup)'
+#         #     location: 'East US'   # CHANGE_ME if needed
+#         #     templateLocation: 'Linked artifact'
+#         #     csmFile: '$(Pipeline.Workspace)/$(artifactName)/$(armOutputFolder)/ARMTemplateForFactory.json'
+#         #     csmParametersFile: '$(Pipeline.Workspace)/$(artifactName)/arm-parameters/dev.parameters.json'
+#         #     deploymentMode: 'Incremental'
+#         #     deploymentName: 'adf-dev-$(Build.BuildId)' 
             
          
