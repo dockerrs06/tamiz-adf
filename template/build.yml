@@ -5,7 +5,6 @@
 parameters:
   - name: branchName
     type: string
-
 jobs:
 - job: BuildADF
   displayName: Build ADF ARM Artifact
@@ -16,21 +15,16 @@ jobs:
     clean: true
     path: adf_publish_repo
 
-  # Debug — keep temporarily
   - powershell: |
-      Write-Host "Pipeline workspace:"
-      Get-ChildItem "$(Pipeline.Workspace)"
-    displayName: Debug Workspace
+      Write-Host "ADF publish repo structure:"
+      Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish_repo"
+    displayName: Debug Repo
 
   - task: CopyFiles@2
     displayName: Copy ADF ARM Templates
     inputs:
-      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
-      Contents: |
-        ARMTemplateForFactory.json
-        ARMTemplateParametersForFactory.json
-        linkedTemplates/**
-        script/**
+      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo/adf_publish'
+      Contents: '**'
       TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
   - task: PublishBuildArtifacts@1
