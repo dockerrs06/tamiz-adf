@@ -1,3 +1,4 @@
+
 parameters:
   - name: branchName
     type: string
@@ -8,8 +9,54 @@ jobs:
     steps:
       - checkout: self
       - script: |
-      echo "ADF validation handled by publish branch."
-      echo "Build stage acts as quality gate only."
+          echo "ADF validation handled by publish branch."
+          echo "Build stage acts as quality gate only."
+          
+      - powershell: |
+          Write-Host "Listing adf_publish branch contents:"
+          Get-ChildItem -Recurse "$(Build.SourcesDirectory)/adfpub" | Select-Object FullName
+            displayName: "List adf_publish files"
+
+
+      - task: CopyFiles@2
+        displayName: "Copy ARM from adf_publish"
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/adfpub'
+          Contents: |
+            ARMTemplateForFactory.json
+            ARMTemplateParametersForFactory.json
+            linkedTemplates/**   # (optional) if you use linked templates
+            script/**            # if adf_publish includes scripts via publish_config.json
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
+
+  # If script/ isn't in adf_publish, copy it from collaboration branch as a fallback
+      - task: CopyFiles@2
+        displayName: "Fallback: Copy script/ from collab branch"
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/script'
+          Contents: '**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish/script'
+        condition: succeededOrFailed()  # ok if folder doesn't exist
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/adf_publish'
+          ArtifactName: 'adf_publish'
+          publishLocation: 'Container'
+
+
+# parameters:
+#   - name: branchName
+#     type: string
+
+# jobs:
+#   - job: BuildJob
+#     displayName: "Build (Validate + Export ARM)"
+#     steps:
+#       - checkout: self
+#       - script: |
+#       echo "ADF validation handled by publish branch."
+#       echo "Build stage acts as quality gate only."
 
       # - script: |
       #     echo "Branch detected: ${{ parameters.branchName }}"
