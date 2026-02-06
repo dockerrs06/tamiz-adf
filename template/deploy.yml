@@ -94,8 +94,10 @@ jobs:
             templateLocation: Linked artifact
             # csmFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateForFactory.json'
             # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateParametersForFactory.json'
-            csmFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateForFactory.json'
-            csmParametersFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateParametersForFactory.json'
+            # csmFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateForFactory.json'
+            # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateParametersForFactory.json'
+            csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
+            csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
             overrideParameters: |
               -factoryName ${{ parameters.adfName }}
             deploymentMode: Incremental
