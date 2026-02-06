@@ -14,18 +14,18 @@ jobs:
 
   - checkout: adfpub
     clean: true
+    path: adf_publish_repo
 
-  # Debug folder structure (important first runs)
+  # Debug — keep this for now
   - powershell: |
-      Write-Host "SourcesDirectory:"
+      Write-Host "SourcesDirectory content:"
       Get-ChildItem "$(Build.SourcesDirectory)"
-    displayName: Debug Source Folder
+    displayName: Debug Sources Dir
 
-  # Copy ARM templates from publish branch
   - task: CopyFiles@2
     displayName: Copy ADF ARM Templates
     inputs:
-      SourceFolder: '$(Build.SourcesDirectory)/tamiz-adf'
+      SourceFolder: '$(Build.SourcesDirectory)/adf_publish_repo'
       Contents: |
         ARMTemplateForFactory.json
         ARMTemplateParametersForFactory.json
@@ -33,13 +33,13 @@ jobs:
         script/**
       TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
-  # Publish artifact
   - task: PublishBuildArtifacts@1
     displayName: Publish ADF Artifact
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/adf_publish'
       ArtifactName: adf_publish
       publishLocation: Container
+
 
 # parameters:
 #   - name: branchName
