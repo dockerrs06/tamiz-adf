@@ -21,10 +21,14 @@ jobs:
     displayName: Debug Repo
 
   - task: CopyFiles@2
-    displayName: Copy ADF ARM Templates
+    displayName: Copy ARM Templates
     inputs:
-      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo/adf_publish'
-      Contents: '**'
+      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
+      Contents: |
+        ARMTemplateForFactory.json
+        ARMTemplateParametersForFactory.json
+        linkedTemplates/**
+        script/**
       TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
   - task: PublishBuildArtifacts@1
