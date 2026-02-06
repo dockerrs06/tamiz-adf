@@ -1,4 +1,3 @@
-
 parameters:
   - name: branchName
     type: string
@@ -6,31 +5,40 @@ parameters:
 jobs:
   - job: BuildJob
     displayName: "Build (Validate + Export ARM)"
+
     steps:
+      # Checkout collaboration branch (self)
       - checkout: self
-      # Check out the publish branch from the GitHub repo
+
+      # Checkout ADF publish branch repo resource (alias: adfpub)
       - checkout: adfpub
         clean: true
+
+      # Detect branch
       - script: |
           echo "Branch detected: ${{ parameters.branchName }}"
           echo "##vso[task.setvariable variable=branchName]${{ parameters.branchName }}"
-        displayName: 🧭 Fetch Branch details
-    
+        displayName: "Fetch Branch Details"
+
+      # List publish branch files
       - script: |
           echo "Listing ADF publish artifacts from adf_publish branch"
           ls -la adfpub
-        displayName: "List ADF publish folder
+        displayName: "List ADF Publish Folder"
+
+      # Build info message
       - script: |
           echo "ADF validation handled by publish branch."
           echo "Build stage acts as quality gate only."
+        displayName: "Build Stage Info"
 
-    
+      # PowerShell listing for full tree
       - powershell: |
           Write-Host "Listing adf_publish branch contents:"
           Get-ChildItem -Recurse "$(Build.SourcesDirectory)/adfpub" | Select-Object FullName
-            displayName: "List adf_publish files"
+        displayName: "List adf_publish Files"
 
-
+      # Copy ARM templates from adf_publish branch
       - task: CopyFiles@2
         displayName: "Copy ARM from adf_publish"
         inputs:
@@ -38,24 +46,27 @@ jobs:
           Contents: |
             ARMTemplateForFactory.json
             ARMTemplateParametersForFactory.json
-            linkedTemplates/**   # (optional) if you use linked templates
-            script/**            # if adf_publish includes scripts via publish_config.json
+            linkedTemplates/**
+            script/**
           TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
-  # If script/ isn't in adf_publish, copy it from collaboration branch as a fallback
+      # Optional fallback copy if script folder not in publish branch
       - task: CopyFiles@2
-        displayName: "Fallback: Copy script/ from collab branch"
+        displayName: "Fallback: Copy script Folder from Collaboration Branch"
+        condition: succeededOrFailed()
         inputs:
           SourceFolder: '$(Build.SourcesDirectory)/script'
           Contents: '**'
           TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish/script'
-        condition: succeededOrFailed()  # ok if folder doesn't exist
 
+      # Publish artifact
       - task: PublishBuildArtifacts@1
+        displayName: "Publish ADF ARM Artifact"
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/adf_publish'
           ArtifactName: 'adf_publish'
           publishLocation: 'Container'
+
 
 
 # parameters:
