@@ -31,14 +31,19 @@ jobs:
     displayName: "DEBUG — Show Repo Structure"
 
       # Copy ONLY from actual publish folder
+  # - task: CopyFiles@2
+  #   displayName: Copy ADF Publish Output
+  #   inputs:
+  #     SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo/adf_publish'
+  #     Contents: '**'
+  #     TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
+
   - task: CopyFiles@2
-    displayName: Copy ADF Publish Output
-    inputs:
-      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo/adf_publish'
-      Contents: '**'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
-
-
+      displayName: Copy Publish Branch Output
+      inputs:
+        SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
   # ---------------- Copy ARM Templates ----------------
   # Recursive pattern — works for any publish branch layout
