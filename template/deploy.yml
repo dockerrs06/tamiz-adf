@@ -71,7 +71,8 @@ jobs:
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: FilePath
-            ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
+            # ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
+            ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
             ScriptArguments: >
               -ResourceGroupName ${{ parameters.resourceGroup }}
               -DataFactoryName ${{ parameters.adfName }}
@@ -112,7 +113,8 @@ jobs:
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: FilePath
-            ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
+            # ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
+            ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
             ScriptArguments: >
               -ResourceGroupName ${{ parameters.resourceGroup }}
               -DataFactoryName ${{ parameters.adfName }}
