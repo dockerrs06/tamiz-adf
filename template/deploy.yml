@@ -67,7 +67,7 @@ jobs:
         # ---------------------------------------
         - task: AzurePowerShell@5
           displayName: Stop ADF Triggers
-          condition: and(succeeded(), eq(variables.scriptExists, 'true'))
+          # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: FilePath
@@ -108,7 +108,7 @@ jobs:
         # ---------------------------------------
         - task: AzurePowerShell@5
           displayName: Start ADF Triggers
-          condition: and(succeeded(), eq(variables.scriptExists, 'true'))
+          # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: FilePath
