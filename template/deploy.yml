@@ -92,8 +92,10 @@ jobs:
             resourceGroupName: ${{ parameters.resourceGroup }}
             location: Central India
             templateLocation: Linked artifact
-            csmFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateForFactory.json'
-            csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateParametersForFactory.json'
+            # csmFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateForFactory.json'
+            # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateParametersForFactory.json'
+            csmFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateForFactory.json'
+            csmParametersFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateParametersForFactory.json'
             overrideParameters: |
               -factoryName ${{ parameters.adfName }}
             deploymentMode: Incremental
