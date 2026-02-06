@@ -6,10 +6,10 @@
 			"value": "ISAC-DEV-ADF"
 		},
 		"AzureBlobStorage1_connectionString": {
-			"value": ""
+			"value": "DefaultEndpointsProtocol=https;AccountName=isacdevstrodest;AccountKey=xxp3a4DcVrUYhoHK6ZH7kAW8Q/BTaXE2wcFldnYALQ12kOdLe3sDPJRVJEiRlG0bd9FB+dnAoqQF+AStt9Q7WQ==;EndpointSuffix=core.windows.net"
 		},
 		"AzureBlobStorage2_connectionString": {
-			"value": ""
+			"value": "DefaultEndpointsProtocol=https;AccountName=isacdevstro;AccountKey=i9inJEs2NOnBsgzdTniZysMiF5yUcXlOaR3npwcxPRgrHbVdRksKEtEcHVq1OCESD2DGmBUHmJaT+ASt/uHXhg==;EndpointSuffix=core.windows.net"
 		}
 	}
 }
