@@ -71,8 +71,8 @@
             adfName: "$(datafactory_dev)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_dev)"
-            blobSourceConnString: '$(blobSourceConnString)'
-            blobDestConnString: '$(blobDestConnString)'
+            # blobSourceConnString: '$(blobSourceConnString)'
+            # blobDestConnString: '$(blobDestConnString)'
             
          
       # ITG Environment (feature_itg branch)
