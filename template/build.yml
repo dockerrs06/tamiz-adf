@@ -21,10 +21,10 @@ jobs:
         displayName: "Fetch Branch Details"
 
       # List publish branch files
-      - script: |
-          echo "Listing ADF publish artifacts from adf_publish branch"
-          ls -la adfpub
-        displayName: "List ADF Publish Folder"
+      # - script: |
+      #     echo "Listing ADF publish artifacts from adf_publish branch"
+      #     ls -la adfpub
+      #   displayName: "List ADF Publish Folder"
 
       # Build info message
       - script: |
