@@ -8,10 +8,23 @@ jobs:
     displayName: "Build (Validate + Export ARM)"
     steps:
       - checkout: self
+      # Check out the publish branch from the GitHub repo
+      - checkout: adfpub
+        clean: true
+      - script: |
+        echo "Branch detected: ${{ parameters.branchName }}"
+        echo "##vso[task.setvariable variable=branchName]${{ parameters.branchName }}"
+      displayName: 🧭 Fetch Branch details
+    
+      - script: |
+          echo "Listing ADF publish artifacts from adf_publish branch"
+          ls -la adfpub
+        displayName: "List ADF publish folder
       - script: |
           echo "ADF validation handled by publish branch."
           echo "Build stage acts as quality gate only."
-          
+
+    
       - powershell: |
           Write-Host "Listing adf_publish branch contents:"
           Get-ChildItem -Recurse "$(Build.SourcesDirectory)/adfpub" | Select-Object FullName
