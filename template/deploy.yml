@@ -99,12 +99,16 @@ jobs:
             # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateParametersForFactory.json'
             csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
             csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
-            overrideParameters: |
-              -factoryName ${{ parameters.adfName }}           
-              -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
-              -AzureBlobStorage2_connectionString "$(blobDestConnString)"
-
-
+            # overrideParameters: |
+            #   -factoryName ${{ parameters.adfName }}           
+            #   -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
+            #   -AzureBlobStorage2_connectionString "$(blobDestConnString)"
+             overrideParameters: |
+              {
+                "factoryName": { "value": "${{ parameters.adfName }}" },
+                "AzureBlobStorage1_connectionString": { "value": "$(blobSourceConnString)" },
+                "AzureBlobStorage2_connectionString": { "value": "$(blobDestConnString)" }
+              }
             deploymentMode: Incremental
 
 
