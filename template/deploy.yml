@@ -103,12 +103,10 @@ jobs:
             #   -factoryName ${{ parameters.adfName }}           
             #   -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
             #   -AzureBlobStorage2_connectionString "$(blobDestConnString)"
-             overrideParameters: |
-              {
-                "factoryName": { "value": "${{ parameters.adfName }}" },
-                "AzureBlobStorage1_connectionString": { "value": "$(blobSourceConnString)" },
-                "AzureBlobStorage2_connectionString": { "value": "$(blobDestConnString)" }
-              }
+            overrideParameters: >
+              -factoryName ${{ parameters.adfName }}
+              -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
+              -AzureBlobStorage2_connectionString "$(blobDestConnString)"
             deploymentMode: 'Incremental'
 
 
