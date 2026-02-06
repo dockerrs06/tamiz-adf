@@ -5,38 +5,66 @@
 parameters:
   - name: branchName
     type: string
+# =====================================================
+# Build Template — ADF Publish ARM Artifact
+# =====================================================
+
 jobs:
 - job: BuildADF
   displayName: Build ADF ARM Artifact
 
   steps:
 
+  # ---------------- Checkout ADF Publish Repo ----------------
   - checkout: adfpub
     clean: true
     path: adf_publish_repo
 
-  - powershell: |
-      Write-Host "ADF publish repo structure:"
-      Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish_repo"
-    displayName: Debug Repo
 
+  # ---------------- Debug — show structure ----------------
+  - powershell: |
+      Write-Host "==== PIPELINE WORKSPACE ===="
+      Get-ChildItem "$(Pipeline.Workspace)"
+
+      Write-Host "==== ADF PUBLISH REPO TREE ===="
+      Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish_repo"
+    displayName: "DEBUG — Show Repo Structure"
+
+
+  # ---------------- Copy ARM Templates ----------------
+  # Recursive pattern — works for any publish branch layout
   - task: CopyFiles@2
-    displayName: Copy ARM Templates
+    displayName: Copy ARM Templates (Recursive Safe)
     inputs:
       SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
       Contents: |
-        ARMTemplateForFactory.json
-        ARMTemplateParametersForFactory.json
-        linkedTemplates/**
-        script/**
+        **/ARMTemplateForFactory.json
+        **/ARMTemplateParametersForFactory.json
+        **/linkedTemplates/**
+        **/script/**
       TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
+
+  # ---------------- Validate Copy Result ----------------
+  - powershell: |
+      if (Test-Path "$(Build.ArtifactStagingDirectory)/adf_publish") {
+        Write-Host "ADF artifact folder created successfully"
+        Get-ChildItem -Recurse "$(Build.ArtifactStagingDirectory)/adf_publish"
+      }
+      else {
+        Write-Error "ADF artifact folder NOT created — copy step failed"
+      }
+    displayName: Validate Artifact Folder
+
+
+  # ---------------- Publish Artifact ----------------
   - task: PublishBuildArtifacts@1
     displayName: Publish ADF Artifact
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/adf_publish'
       ArtifactName: adf_publish
       publishLocation: Container
+
 
 
 
