@@ -12,9 +12,9 @@ jobs:
       - checkout: adfpub
         clean: true
       - script: |
-        echo "Branch detected: ${{ parameters.branchName }}"
-        echo "##vso[task.setvariable variable=branchName]${{ parameters.branchName }}"
-      displayName: 🧭 Fetch Branch details
+          echo "Branch detected: ${{ parameters.branchName }}"
+          echo "##vso[task.setvariable variable=branchName]${{ parameters.branchName }}"
+       displayName: 🧭 Fetch Branch details
     
       - script: |
           echo "Listing ADF publish artifacts from adf_publish branch"
