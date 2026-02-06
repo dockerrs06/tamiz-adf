@@ -100,7 +100,13 @@ jobs:
             csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
             csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
             overrideParameters: |
-              -factoryName ${{ parameters.adfName }}
+              -factoryName ${{ parameters.adfName }}           
+              # -AzureBlobStorage1_serviceEndpoint "$(blobSourceServiceEndpoint)"
+              # -AzureBlobStorage2_serviceEndpoint "$(blobDestServiceEndpoint)"
+              -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
+              -AzureBlobStorage2_connectionString "$(blobDestConnString)"
+
+
             deploymentMode: Incremental
 
 
