@@ -16,16 +16,16 @@ jobs:
     clean: true
     path: adf_publish_repo
 
-  # Debug — keep this for now
+  # Debug — keep temporarily
   - powershell: |
-      Write-Host "SourcesDirectory content:"
-      Get-ChildItem "$(Build.SourcesDirectory)"
-    displayName: Debug Sources Dir
+      Write-Host "Pipeline workspace:"
+      Get-ChildItem "$(Pipeline.Workspace)"
+    displayName: Debug Workspace
 
   - task: CopyFiles@2
     displayName: Copy ADF ARM Templates
     inputs:
-      SourceFolder: '$(Build.SourcesDirectory)/adf_publish_repo'
+      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
       Contents: |
         ARMTemplateForFactory.json
         ARMTemplateParametersForFactory.json
@@ -39,6 +39,8 @@ jobs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/adf_publish'
       ArtifactName: adf_publish
       publishLocation: Container
+
+
 
 
 # parameters:
