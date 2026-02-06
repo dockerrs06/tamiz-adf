@@ -10,7 +10,6 @@ parameters:
   - name: subscriptionID
     type: string
 
-
 jobs:
 - deployment: DeployADF
   displayName: Deploy ADF to ${{ parameters.Environment }}
@@ -32,56 +31,65 @@ jobs:
             artifactName: adf_publish
             downloadPath: '$(Pipeline.Workspace)'
 
-        # - task: DownloadPipelineArtifact@2
-        #   displayName: Download ADF Artifact
-        #   inputs:
-        #     source: current
-        #     artifact: adf_publish
-        #     path: '$(Pipeline.Workspace)/adf_publish'
-
-
         # ---------------------------------------
         # 2) Debug — List Files
         # ---------------------------------------
-        - powershell: |
+        - pwsh: |
             Write-Host "ADF artifact contents:"
-            Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish"
+            Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish" | Select-Object FullName
           displayName: List Artifact Files
-
 
         # ---------------------------------------
         # 3) Check Script Exists
         # ---------------------------------------
-        - powershell: |
-            $path = "$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1"
+        - pwsh: |
+            $path = "$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1"
             if (Test-Path $path) {
               Write-Host "##vso[task.setvariable variable=scriptExists]true"
+              Write-Host "Pre/Post deployment script found at: $path"
             } else {
               Write-Host "##vso[task.setvariable variable=scriptExists]false"
+              Write-Host "WARNING: Pre/Post deployment script not found at: $path"
             }
           displayName: Verify Script Exists
-
 
         # ---------------------------------------
         # 4) Stop Triggers
         # ---------------------------------------
         - task: AzurePowerShell@5
           displayName: Stop ADF Triggers
+          # Optional: enable condition if you want strict script presence check
           # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: FilePath
-            # ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
             ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
             ScriptArguments: >
-              -ResourceGroupName ${{ parameters.resourceGroup }}
-              -DataFactoryName ${{ parameters.adfName }}
+              -ResourceGroupName "${{ parameters.resourceGroup }}"
+              -DataFactoryName "${{ parameters.adfName }}"
               -Action Stop
             azurePowerShellVersion: LatestVersion
 
+        # ---------------------------------------
+        # 5) Sanitize Connection Strings (FIXES newline/empty key/JSON parse errors)
+        # ---------------------------------------
+        - pwsh: |
+            $src = "$(blobSourceConnString)"
+            $dst = "$(blobDestConnString)"
+
+            if ([string]::IsNullOrWhiteSpace($src)) { throw "blobSourceConnString is empty/not loaded. Check variable group / Key Vault link." }
+            if ([string]::IsNullOrWhiteSpace($dst)) { throw "blobDestConnString is empty/not loaded. Check variable group / Key Vault link." }
+
+            # Trim removes CR/LF + whitespace that breaks ARM overrideParameters parsing
+            $src = $src.Trim().Trim('"')
+            $dst = $dst.Trim().Trim('"')
+
+            Write-Host "##vso[task.setvariable variable=blobSourceConnStringTrim;issecret=true]$src"
+            Write-Host "##vso[task.setvariable variable=blobDestConnStringTrim;issecret=true]$dst"
+          displayName: Sanitize blob connection strings (trim CR/LF and quotes)
 
         # ---------------------------------------
-        # 5) Deploy ARM
+        # 6) Deploy ARM
         # ---------------------------------------
         - task: AzureResourceManagerTemplateDeployment@3
           displayName: Deploy ADF ARM Template
@@ -93,39 +101,158 @@ jobs:
             resourceGroupName: ${{ parameters.resourceGroup }}
             location: Central India
             templateLocation: Linked artifact
-            # csmFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateForFactory.json'
-            # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateParametersForFactory.json'
-            # csmFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateForFactory.json'
-            # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateParametersForFactory.json'
             csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
             csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
-            # overrideParameters: |
-            #   -factoryName ${{ parameters.adfName }}           
-            #   -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
-            #   -AzureBlobStorage2_connectionString "$(blobDestConnString)"
             overrideParameters: >
-              -factoryName ${{ parameters.adfName }}
-              -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
-              -AzureBlobStorage2_connectionString "$(blobDestConnString)"
+              -factoryName "${{ parameters.adfName }}"
+              -AzureBlobStorage1_connectionString "$(blobSourceConnStringTrim)"
+              -AzureBlobStorage2_connectionString "$(blobDestConnStringTrim)"
             deploymentMode: 'Incremental'
 
-
         # ---------------------------------------
-        # 6) Start Triggers
+        # 7) Start Triggers
         # ---------------------------------------
         - task: AzurePowerShell@5
           displayName: Start ADF Triggers
+          # Optional: enable condition if you want strict script presence check
           # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
           inputs:
             azureSubscription: ${{ parameters.AzureServiceConnection }}
             ScriptType: FilePath
-            # ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
             ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
             ScriptArguments: >
-              -ResourceGroupName ${{ parameters.resourceGroup }}
-              -DataFactoryName ${{ parameters.adfName }}
+              -ResourceGroupName "${{ parameters.resourceGroup }}"
+              -DataFactoryName "${{ parameters.adfName }}"
               -Action Start
             azurePowerShellVersion: LatestVersion
+# parameters:
+#   - name: Environment
+#     type: string
+#   - name: adfName
+#     type: string
+#   - name: resourceGroup
+#     type: string
+#   - name: AzureServiceConnection
+#     type: string
+#   - name: subscriptionID
+#     type: string
+
+
+# jobs:
+# - deployment: DeployADF
+#   displayName: Deploy ADF to ${{ parameters.Environment }}
+#   environment: ${{ parameters.Environment }}
+
+#   strategy:
+#     runOnce:
+#       deploy:
+#         steps:
+
+#         # ---------------------------------------
+#         # 1) Download Artifact
+#         # ---------------------------------------
+#         - task: DownloadBuildArtifacts@0
+#           displayName: Download ADF Artifact
+#           inputs:
+#             buildType: current
+#             downloadType: single
+#             artifactName: adf_publish
+#             downloadPath: '$(Pipeline.Workspace)'
+
+#         # - task: DownloadPipelineArtifact@2
+#         #   displayName: Download ADF Artifact
+#         #   inputs:
+#         #     source: current
+#         #     artifact: adf_publish
+#         #     path: '$(Pipeline.Workspace)/adf_publish'
+
+
+#         # ---------------------------------------
+#         # 2) Debug — List Files
+#         # ---------------------------------------
+#         - powershell: |
+#             Write-Host "ADF artifact contents:"
+#             Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish"
+#           displayName: List Artifact Files
+
+
+#         # ---------------------------------------
+#         # 3) Check Script Exists
+#         # ---------------------------------------
+#         - powershell: |
+#             $path = "$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1"
+#             if (Test-Path $path) {
+#               Write-Host "##vso[task.setvariable variable=scriptExists]true"
+#             } else {
+#               Write-Host "##vso[task.setvariable variable=scriptExists]false"
+#             }
+#           displayName: Verify Script Exists
+
+
+#         # ---------------------------------------
+#         # 4) Stop Triggers
+#         # ---------------------------------------
+#         - task: AzurePowerShell@5
+#           displayName: Stop ADF Triggers
+#           # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
+#           inputs:
+#             azureSubscription: ${{ parameters.AzureServiceConnection }}
+#             ScriptType: FilePath
+#             # ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
+#             ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
+#             ScriptArguments: >
+#               -ResourceGroupName ${{ parameters.resourceGroup }}
+#               -DataFactoryName ${{ parameters.adfName }}
+#               -Action Stop
+#             azurePowerShellVersion: LatestVersion
+
+
+#         # ---------------------------------------
+#         # 5) Deploy ARM
+#         # ---------------------------------------
+#         - task: AzureResourceManagerTemplateDeployment@3
+#           displayName: Deploy ADF ARM Template
+#           inputs:
+#             deploymentScope: Resource Group
+#             azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
+#             subscriptionId: ${{ parameters.subscriptionID }}
+#             action: Create Or Update Resource Group
+#             resourceGroupName: ${{ parameters.resourceGroup }}
+#             location: Central India
+#             templateLocation: Linked artifact
+#             # csmFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateForFactory.json'
+#             # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ARMTemplateParametersForFactory.json'
+#             # csmFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateForFactory.json'
+#             # csmParametersFile: '$(Pipeline.Workspace)/adf_publish/adf_publish/ARMTemplateParametersForFactory.json'
+#             csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
+#             csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
+#             # overrideParameters: |
+#             #   -factoryName ${{ parameters.adfName }}           
+#             #   -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
+#             #   -AzureBlobStorage2_connectionString "$(blobDestConnString)"
+#             overrideParameters: >
+#               -factoryName ${{ parameters.adfName }}
+#               -AzureBlobStorage1_connectionString "$(blobSourceConnString)"
+#               -AzureBlobStorage2_connectionString "$(blobDestConnString)"
+#             deploymentMode: 'Incremental'
+
+
+#         # ---------------------------------------
+#         # 6) Start Triggers
+#         # ---------------------------------------
+#         - task: AzurePowerShell@5
+#           displayName: Start ADF Triggers
+#           # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
+#           inputs:
+#             azureSubscription: ${{ parameters.AzureServiceConnection }}
+#             ScriptType: FilePath
+#             # ScriptPath: '$(Pipeline.Workspace)/adf_publish/script/PrePostDeploymentScript.ps1'
+#             ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
+#             ScriptArguments: >
+#               -ResourceGroupName ${{ parameters.resourceGroup }}
+#               -DataFactoryName ${{ parameters.adfName }}
+#               -Action Start
+#             azurePowerShellVersion: LatestVersion
 
 # parameters:
 #   - name: Environment
