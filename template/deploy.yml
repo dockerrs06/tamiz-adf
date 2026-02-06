@@ -109,7 +109,7 @@ jobs:
                 "AzureBlobStorage1_connectionString": { "value": "$(blobSourceConnString)" },
                 "AzureBlobStorage2_connectionString": { "value": "$(blobDestConnString)" }
               }
-            deploymentMode: Incremental
+            deploymentMode: Incrementa
 
 
         # ---------------------------------------
