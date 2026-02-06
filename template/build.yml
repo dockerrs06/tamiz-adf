@@ -1,4 +1,3 @@
-
 # ==========================================
 # Build Template – ADF Publish Artifact
 # ==========================================
@@ -38,12 +37,12 @@ jobs:
   #     Contents: '**'
   #     TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
-    - task: CopyFiles@2
-        displayName: Copy Publish Branch Output
-        inputs:
-          SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
-          Contents: '**'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
+  - task: CopyFiles@2
+    displayName: Copy Publish Branch Output
+    inputs:
+      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
   # ---------------- Copy ARM Templates ----------------
   # Recursive pattern — works for any publish branch layout
