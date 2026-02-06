@@ -1,9 +1,9 @@
 {
-	"name": "rajan",
+	"name": "pipeline1",
 	"properties": {
 		"activities": [
 			{
-				"name": "sundarrajan",
+				"name": "fgsgdss",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -49,13 +49,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "source_ds_Dev",
+						"referenceName": "source",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "dest_ls_dev",
+						"referenceName": "dest",
 						"type": "DatasetReference"
 					}
 				]

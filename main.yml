@@ -13,35 +13,36 @@
 #  Main.yaml:
 # ================================================================================================================
 
- trigger:
-  branches:
-    include:
-       - main
-       - feature_itg
-       - develop
-  
- pr: none
- pool:
-   vmImage: 'windows-latest'
+  trigger:
+    branches:
+      include:
+        - main
+        - feature_itg
+        - develop
+    
+  pr: none
+  pool:
+    vmImage: 'windows-latest'
 
   
+  # -------- Parameters --------
+  # parameters:
+  #   - name: branchName
+  #     type: string
+  #     default: adf_publish
 
- stages:
-# ============================================================================================================================
-# 1) BUILD STAGE: Validate + Export ARM template + Publish artifact
-# Azure Data Factory does not provide a built in CLI for validating or exporting ARM templates.
-# Instead, Microsoft provides an ADF Utilities package, which is a Node.js-based tool, installed from npm:
-# ➡️ @microsoft/azure-data-factory-utilities
-# (or older: npm install -g azure-data-factory-utilities)
+  # -------- Resources (GitHub Repo) --------
+  resources:
+    repositories:
+      - repository: adfpub
+        type: github
+        name: dockerrs06/tamiz-adf
+        ref: refs/heads/adf_publish
+        endpoint: github.com_dockerrs06
 
 
-# Your commands like:
+  stages:
 
-# run build validate
-# run build export
-# come from this npm package, not from Azure DevOps itself.
-
-# Before you can run the validate/export scripts, you must install the npm dependencies that contain those utility commands.
 # ==============================================================================================================================
 
   - stage: Build
@@ -53,16 +54,6 @@
 
 
 
-# ================================================================================================================
-  # DEPLOY STAGE: PUBLISH ARM TEMPLATE TO RESPECTIVE ENVIRONMENT
-  # This job deploys an Azure Data Factory (ADF) to a Resource Group using an ARM template and parameter file that 
-  # were previously built and published as a pipeline artifact.
-
-# Azure Data Factory (ADF) does NOT deploy pipelines, datasets, or triggers automatically.
-# The only DevOps supported way to deploy ADF from one environment to another is through ARM templates (or Bicep).
-# So your pipeline must use something like:
-# AzureResourceManagerTemplateDeployment@ Otherwise, ADF objects will never move from Dev → ITG → Production.
-# ===============================================================================================================
   - stage: Deploy
     displayName: 🚀 Deploy Stage
     dependsOn: Build
@@ -80,9 +71,10 @@
             adfName: "$(datafactory_dev)"
             subscriptionID: "$(devSubscriptionId)"
             resourceGroup: "$(resoucegroup_dev)"
+            # blobSourceConnString: '$(blobSourceConnString)'
+            # blobDestConnString: '$(blobDestConnString)'
+            
          
-          
-
       # ITG Environment (feature_itg branch)
       - ${{ if eq(variables['Build.SourceBranchName'], 'feature_itg') }}:
         - template: template/deploy.yml
@@ -94,7 +86,6 @@
             resourceGroup: "$(resoucegroup_itg)"
             
            
-
       # PROD Environment (release branch)
       - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
         - template: template/deploy.yml

@@ -1,8 +1,8 @@
 {
-	"name": "source_ds_Dev",
+	"name": "source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "source_ls_dev",
+			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -15,32 +15,40 @@
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
-			"firstRowAsHeader": false,
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": [
 			{
+				"name": "EmployeeID",
 				"type": "String"
 			},
 			{
+				"name": "FirstName",
 				"type": "String"
 			},
 			{
+				"name": "LastName",
 				"type": "String"
 			},
 			{
+				"name": "Department",
 				"type": "String"
 			},
 			{
+				"name": "Email",
 				"type": "String"
 			},
 			{
+				"name": "Salary",
 				"type": "String"
 			},
 			{
+				"name": "JoinDate",
 				"type": "String"
 			},
 			{
+				"name": "IsActive",
 				"type": "String"
 			}
 		]

@@ -1,1 +1,9 @@
-{"publishBranch":"adf_publish","enableGitComment":true}
+
+{
+  "publishBranch": "adf_publish",
+  "enableGitComment": true,
+  "includePath": [
+    "script",
+    "template"
+  ]
+}
