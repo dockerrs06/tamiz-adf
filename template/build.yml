@@ -30,19 +30,28 @@ jobs:
       Get-ChildItem -Recurse "$(Pipeline.Workspace)/adf_publish_repo"
     displayName: "DEBUG — Show Repo Structure"
 
+      # Copy ONLY from actual publish folder
+  - task: CopyFiles@2
+    displayName: Copy ADF Publish Output
+    inputs:
+      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo/adf_publish'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
+
+
 
   # ---------------- Copy ARM Templates ----------------
   # Recursive pattern — works for any publish branch layout
-  - task: CopyFiles@2
-    displayName: Copy ARM Templates (Recursive Safe)
-    inputs:
-      SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
-      Contents: |
-        **/ARMTemplateForFactory.json
-        **/ARMTemplateParametersForFactory.json
-        **/linkedTemplates/**
-        **/script/**
-      TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
+  # - task: CopyFiles@2
+  #   displayName: Copy ARM Templates (Recursive Safe)
+  #   inputs:
+  #     SourceFolder: '$(Pipeline.Workspace)/adf_publish_repo'
+  #     Contents: |
+  #       **/ARMTemplateForFactory.json
+  #       **/ARMTemplateParametersForFactory.json
+  #       **/linkedTemplates/**
+  #       **/script/**
+  #     TargetFolder: '$(Build.ArtifactStagingDirectory)/adf_publish'
 
 
   # ---------------- Validate Copy Result ----------------
