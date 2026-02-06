@@ -26,10 +26,10 @@
 
   
   # -------- Parameters --------
-  parameters:
-    - name: branchName
-      type: string
-      default: adf_publish
+  # parameters:
+  #   - name: branchName
+  #     type: string
+  #     default: adf_publish
 
   # -------- Resources (GitHub Repo) --------
   resources:
@@ -37,7 +37,7 @@
       - repository: adfpub
         type: github
         name: dockerrs06/tamiz-adf
-        ref: refs/heads/${{ parameters.branchName }}
+        ref: refs/heads/adf_publish
         endpoint: github.com_dockerrs06
 
 
