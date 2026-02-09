@@ -5,7 +5,10 @@
 		"factoryName": {
 			"value": "ISAC-DEV-ADF"
 		},
-		"dest_connectionString": {
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage2_connectionString": {
 			"value": ""
 		},
 		"containerUri": {
