@@ -308,8 +308,8 @@
 				"typeProperties": {
 					"recurrence": {
 						"frequency": "Minute",
-						"interval": 2,
-						"startTime": "2026-02-06T19:30:00",
+						"interval": 10,
+						"startTime": "2026-02-09T16:48:00",
 						"timeZone": "India Standard Time"
 					}
 				}
