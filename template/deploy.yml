@@ -73,58 +73,58 @@ jobs:
         # ---------------------------------------
         # 5) Sanitize Connection Strings (FIXES newline/empty key/JSON parse errors)
         # ---------------------------------------
-        - pwsh: |
-            $src = "$(blobSourceConnString)"
-            $dst = "$(blobDestConnString)"
+        # - pwsh: |
+        #     $src = "$(blobSourceConnString)"
+        #     $dst = "$(blobDestConnString)"
 
-            if ([string]::IsNullOrWhiteSpace($src)) { throw "blobSourceConnString is empty/not loaded. Check variable group / Key Vault link." }
-            if ([string]::IsNullOrWhiteSpace($dst)) { throw "blobDestConnString is empty/not loaded. Check variable group / Key Vault link." }
+        #     if ([string]::IsNullOrWhiteSpace($src)) { throw "blobSourceConnString is empty/not loaded. Check variable group / Key Vault link." }
+        #     if ([string]::IsNullOrWhiteSpace($dst)) { throw "blobDestConnString is empty/not loaded. Check variable group / Key Vault link." }
 
-            # Trim removes CR/LF + whitespace that breaks ARM overrideParameters parsing
-            $src = $src.Trim().Trim('"')
-            $dst = $dst.Trim().Trim('"')
+        #     # Trim removes CR/LF + whitespace that breaks ARM overrideParameters parsing
+        #     $src = $src.Trim().Trim('"')
+        #     $dst = $dst.Trim().Trim('"')
 
-            Write-Host "##vso[task.setvariable variable=blobSourceConnStringTrim;issecret=true]$src"
-            Write-Host "##vso[task.setvariable variable=blobDestConnStringTrim;issecret=true]$dst"
-          displayName: Sanitize blob connection strings (trim CR/LF and quotes)
+        #     Write-Host "##vso[task.setvariable variable=blobSourceConnStringTrim;issecret=true]$src"
+        #     Write-Host "##vso[task.setvariable variable=blobDestConnStringTrim;issecret=true]$dst"
+        #   displayName: Sanitize blob connection strings (trim CR/LF and quotes)
 
-        # ---------------------------------------
-        # 6) Deploy ARM
-        # ---------------------------------------
-        - task: AzureResourceManagerTemplateDeployment@3
-          displayName: Deploy ADF ARM Template
-          inputs:
-            deploymentScope: Resource Group
-            azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
-            subscriptionId: ${{ parameters.subscriptionID }}
-            action: Create Or Update Resource Group
-            resourceGroupName: ${{ parameters.resourceGroup }}
-            location: Central India
-            templateLocation: Linked artifact
-            csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
-            csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
-            overrideParameters: >
-              -factoryName "${{ parameters.adfName }}"
-              -AzureBlobStorage1_connectionString "$(blobSourceConnStringTrim)"
-              -AzureBlobStorage2_connectionString "$(blobDestConnStringTrim)"
-            deploymentMode: 'Incremental'
+        # # ---------------------------------------
+        # # 6) Deploy ARM
+        # # ---------------------------------------
+        # - task: AzureResourceManagerTemplateDeployment@3
+        #   displayName: Deploy ADF ARM Template
+        #   inputs:
+        #     deploymentScope: Resource Group
+        #     azureResourceManagerConnection: ${{ parameters.AzureServiceConnection }}
+        #     subscriptionId: ${{ parameters.subscriptionID }}
+        #     action: Create Or Update Resource Group
+        #     resourceGroupName: ${{ parameters.resourceGroup }}
+        #     location: Central India
+        #     templateLocation: Linked artifact
+        #     csmFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateForFactory.json'
+        #     csmParametersFile: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/ARMTemplateParametersForFactory.json'
+        #     overrideParameters: >
+        #       -factoryName "${{ parameters.adfName }}"
+        #       -AzureBlobStorage1_connectionString "$(blobSourceConnStringTrim)"
+        #       -AzureBlobStorage2_connectionString "$(blobDestConnStringTrim)"
+        #     deploymentMode: 'Incremental'
 
-        # ---------------------------------------
-        # 7) Start Triggers
-        # ---------------------------------------
-        - task: AzurePowerShell@5
-          displayName: Start ADF Triggers
-          # Optional: enable condition if you want strict script presence check
-          # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
-          inputs:
-            azureSubscription: ${{ parameters.AzureServiceConnection }}
-            ScriptType: FilePath
-            ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
-            ScriptArguments: >
-              -ResourceGroupName "${{ parameters.resourceGroup }}"
-              -DataFactoryName "${{ parameters.adfName }}"
-              -Action Start
-            azurePowerShellVersion: LatestVersion
+        # # ---------------------------------------
+        # # 7) Start Triggers
+        # # ---------------------------------------
+        # - task: AzurePowerShell@5
+        #   displayName: Start ADF Triggers
+        #   # Optional: enable condition if you want strict script presence check
+        #   # condition: and(succeeded(), eq(variables.scriptExists, 'true'))
+        #   inputs:
+        #     azureSubscription: ${{ parameters.AzureServiceConnection }}
+        #     ScriptType: FilePath
+        #     ScriptPath: '$(Pipeline.Workspace)/adf_publish/ISAC-DEV-ADF/script/PrePostDeploymentScript.ps1'
+        #     ScriptArguments: >
+        #       -ResourceGroupName "${{ parameters.resourceGroup }}"
+        #       -DataFactoryName "${{ parameters.adfName }}"
+        #       -Action Start
+        #     azurePowerShellVersion: LatestVersion
 # parameters:
 #   - name: Environment
 #     type: string
