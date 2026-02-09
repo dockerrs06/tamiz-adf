@@ -4,9 +4,6 @@
 	"parameters": {
 		"factoryName": {
 			"value": "ISAC-DEV-ADF"
-		},
-		"dest_connectionString": {
-			"value": ""
 		}
 	}
 }
