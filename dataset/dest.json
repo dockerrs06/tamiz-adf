@@ -2,7 +2,7 @@
 	"name": "dest",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage2",
+			"referenceName": "dest",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
