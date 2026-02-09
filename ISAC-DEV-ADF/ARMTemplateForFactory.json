@@ -19,6 +19,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'SqlServer1'"
 		},
+		"source_ls_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'source_ls'"
+		},
+		"dest_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'dest'"
+		},
 		"SqlServer1_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "DESKTOP-343L83U\\SQLEXPRESS01 "
@@ -30,18 +38,6 @@
 		"SqlServer1_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "DESKTOP-343L83U\\sundar"
-		},
-		"SqlServer2_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "@{linkedService().serverName}"
-		},
-		"SqlServer2_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "@{linkedService().dbName}"
-		},
-		"SqlServer2_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "@{linkedService().userName}"
 		}
 	},
 	"variables": {
@@ -131,7 +127,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage2",
+					"referenceName": "dest",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -149,7 +145,7 @@
 				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage2')]"
+				"[concat(variables('factoryId'), '/linkedServices/dest')]"
 			]
 		},
 		{
@@ -158,7 +154,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
+					"referenceName": "source_ls",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -210,7 +206,7 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+				"[concat(variables('factoryId'), '/linkedServices/source_ls')]"
 			]
 		},
 		{
@@ -235,6 +231,46 @@
 				"type": "AzureBlobStorage",
 				"typeProperties": {
 					"connectionString": "[parameters('AzureBlobStorage2_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"dbname": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('SqlServer1_properties_typeProperties_server')]",
+					"database": "[parameters('SqlServer1_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('SqlServer1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('SqlServer1_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/source_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('source_ls_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -270,61 +306,24 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"parameters": {
-					"dbname": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"server": "[parameters('SqlServer1_properties_typeProperties_server')]",
-					"database": "[parameters('SqlServer1_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": true,
-					"authenticationType": "SQL",
-					"userName": "[parameters('SqlServer1_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('SqlServer1_password')]"
-					}
-				}
+				"type": "SelfHosted",
+				"typeProperties": {}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SqlServer2')]",
+			"name": "[concat(parameters('factoryName'), '/dest')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"parameters": {
-					"serverName": {
-						"type": "string"
-					},
-					"dbName": {
-						"type": "string"
-					},
-					"userName": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
-				"type": "SqlServer",
+				"type": "AzureBlobStorage",
 				"typeProperties": {
-					"server": "[parameters('SqlServer2_properties_typeProperties_server')]",
-					"database": "[parameters('SqlServer2_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": true,
-					"authenticationType": "SQL",
-					"userName": "[parameters('SqlServer2_properties_typeProperties_userName')]",
-					"password": "@{linkedService().password}"
+					"connectionString": "[parameters('dest_connectionString')]"
 				}
 			},
 			"dependsOn": []
