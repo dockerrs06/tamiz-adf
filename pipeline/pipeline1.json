@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "fgsgdss",
+				"name": "yellow",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
