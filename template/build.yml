@@ -1,6 +1,14 @@
 # ==========================================
 # Build Template – ADF Publish Artifact
 # ==========================================
+resources:
+  repositories:
+    - repository: adfpub
+      type: github
+      name: dockerrs06/tamiz-adf
+      ref: refs/heads/${{ parameters.branchName }}
+      endpoint: github.com_dockerrs06
+
 parameters:
   - name: branchName
     type: string
@@ -18,6 +26,13 @@ jobs:
   - checkout: adfpub
     clean: true
     path: adf_publish_repo
+
+    
+  - script: |
+      echo "Branch detected: ${{ parameters.branchName }}"
+      echo "##vso[task.setvariable variable=branchName]${{ parameters.branchName }}"
+    displayName: "Fetch Branch Details"
+
 
 
   # ---------------- Debug — show structure ----------------
