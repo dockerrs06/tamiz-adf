@@ -14,10 +14,10 @@
 		"SqlServer1_password": {
 			"value": ""
 		},
-		"source_ls_connectionString": {
+		"dest_connectionString": {
 			"value": ""
 		},
-		"dest_connectionString": {
+		"source_ls_connectionString": {
 			"value": ""
 		},
 		"SqlServer1_properties_typeProperties_server": {
