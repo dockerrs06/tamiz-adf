@@ -5,29 +5,8 @@
 		"factoryName": {
 			"value": "ISAC-DEV-ADF"
 		},
-		"AzureBlobStorage1_connectionString": {
-			"value": ""
-		},
-		"AzureBlobStorage2_connectionString": {
-			"value": ""
-		},
-		"SqlServer1_password": {
-			"value": ""
-		},
 		"dest_connectionString": {
 			"value": ""
-		},
-		"source_ls_connectionString": {
-			"value": ""
-		},
-		"SqlServer1_properties_typeProperties_server": {
-			"value": "DESKTOP-343L83U\\SQLEXPRESS01 "
-		},
-		"SqlServer1_properties_typeProperties_database": {
-			"value": "@{linkedService().dbname}"
-		},
-		"SqlServer1_properties_typeProperties_userName": {
-			"value": "DESKTOP-343L83U\\sundar"
 		}
 	}
 }
