@@ -1,13 +1,13 @@
 # ==========================================
 # Build Template – ADF Publish Artifact
 # ==========================================
-resources:
-  repositories:
-    - repository: adfpub
-      type: github
-      name: dockerrs06/tamiz-adf
-      ref: refs/heads/${{ parameters.branchName }}
-      endpoint: github.com_dockerrs06
+# resources:
+#   repositories:
+#     - repository: adfpub
+#       type: github
+#       name: dockerrs06/tamiz-adf
+#       ref: refs/heads/${{ parameters.branchName }}
+#       endpoint: github.com_dockerrs06
 
 parameters:
   - name: branchName
