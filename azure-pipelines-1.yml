@@ -6,34 +6,30 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo "Hello, colorful Azure DevOps!"
-  displayName: 'Warm-up script'
 
-# FULL COLOR DEMO
+steps:
 - script: |
     echo "=== Foreground Colors ==="
-    echo "`e[32mGREEN OK`e[0m"
-    echo "`e[31mRED ALERT`e[0m"
-    echo "`e[33mYELLOW WARNING`e[0m"
-    echo "`e[36mCYAN INFORMATION`e[0m"
+    echo -e "\033[32mGREEN OK\033[0m"
+    echo -e "\033[31mRED ALERT\033[0m"
+    echo -e "\033[33mYELLOW WARNING\033[0m"
+    echo -e "\033[36mCYAN INFORMATION\033[0m"
 
     echo ""
     echo "=== Background Colors ==="
-    echo "`e[42m   GREEN BACKGROUND   `e[0m"
-    echo "`e[41m   RED BACKGROUND     `e[0m"
-    echo "`e[43m   YELLOW BACKGROUND  `e[0m"
-    echo "`e[46m   CYAN BACKGROUND    `e[0m"
+    echo -e "\033[42m   GREEN BACKGROUND   \033[0m"
+    echo -e "\033[41m   RED BACKGROUND     \033[0m"
+    echo -e "\033[43m   YELLOW BACKGROUND  \033[0m"
+    echo -e "\033[46m   CYAN BACKGROUND    \033[0m"
 
     echo ""
     echo "=== Mixed Style ==="
-    echo "`e[1;33;44mBOLD YELLOW on BLUE BACKGROUND`e[0m"
-    echo "`e[97;41mWHITE TEXT on RED BACKGROUND`e[0m"
+    echo -e "\033[1;33;44mBOLD YELLOW ON BLUE BACKGROUND\033[0m"
+    echo -e "\033[97;41mWHITE ON RED BACKGROUND\033[0m"
 
     echo ""
-    echo "=== Azure DevOps Built-in Logging Commands ==="
-    echo "##[section]SECTION HEADER"
-    echo "##[warning]This is a WARNING"
-    echo "##[error]This is an ERROR"
-    echo "##[debug]Debug message"
+    echo "=== Azure DevOps Built-In Commands ==="
+    echo "##[section]This is a section"
+    echo "##[warning]This is a warning"
+    echo "##[error]This is an error"
   displayName: "Colorful Azure DevOps Console Demo"
