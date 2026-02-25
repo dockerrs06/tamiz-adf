@@ -1,7 +1,4 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Starter pipeline with colorful console output
 
 trigger:
 - main
@@ -10,13 +7,33 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: echo "Hello, colorful Azure DevOps!"
+  displayName: 'Warm-up script'
 
+# FULL COLOR DEMO
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-    Write-Host "`e[32mGREEN OK`e[0m"; Write-Host "`e[31mRED ALERT`e[0m"; Write-Host "`e[33mYELLOW WARN`e[0m"; Write-Host "`e[36mCYAN INFO`e[0m"
-  displayName: 'Run a multi-line script'
+    echo "=== Foreground Colors ==="
+    echo "`e[32mGREEN OK`e[0m"
+    echo "`e[31mRED ALERT`e[0m"
+    echo "`e[33mYELLOW WARNING`e[0m"
+    echo "`e[36mCYAN INFORMATION`e[0m"
 
-  
+    echo ""
+    echo "=== Background Colors ==="
+    echo "`e[42m   GREEN BACKGROUND   `e[0m"
+    echo "`e[41m   RED BACKGROUND     `e[0m"
+    echo "`e[43m   YELLOW BACKGROUND  `e[0m"
+    echo "`e[46m   CYAN BACKGROUND    `e[0m"
+
+    echo ""
+    echo "=== Mixed Style ==="
+    echo "`e[1;33;44mBOLD YELLOW on BLUE BACKGROUND`e[0m"
+    echo "`e[97;41mWHITE TEXT on RED BACKGROUND`e[0m"
+
+    echo ""
+    echo "=== Azure DevOps Built-in Logging Commands ==="
+    echo "##[section]SECTION HEADER"
+    echo "##[warning]This is a WARNING"
+    echo "##[error]This is an ERROR"
+    echo "##[debug]Debug message"
+  displayName: "Colorful Azure DevOps Console Demo"
